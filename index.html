@@ -1,9 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>My website</title>
+	<title>Personal website</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style type="text/css">
+
+		.main{
+			display: grid;
+			grid-template-columns: 1fr 3fr;
+			/*grid-template-rows: 1fr;*/
+			grid-column-gap: 3px;
+		}
+		.circlepic {
+    	border-radius: 50%;
+		}
+		.sidebar{
+			background-color: #ddd;
+		}
+		.menubar{
+			background-color: #def;
+        grid-column: 1 / 2;
+        grid-row: 1;
+        position: sticky;
+        top: 0;
+        left: 0;
+        height: 100vh;
+		}
+		a{
+			text-decoration: none;
+		}
+	</style>
 </head>
 <body>
-
+<div class="main">
+	<div class="menubar">
+			<center>
+			<div>
+				<img src="./sideshree.jpg" height="232px" width="200px" class="circlepic">
+			<!-- </div> -->
+			<!-- <div> -->
+				<h2>Shreejan Pandit</h2>
+				<a href="#Home" >Home</a><br><br><br>
+				<a href="#About">About</a><br><br><br>
+				<a href="#Service" >Service</a><br><br><br>
+				<a href="#Skills" >SKills</a><br><br><br>
+				<a href="#Education" >Education</a><br><br><br>
+				<a href="#Contact" >Contact</a><br><br>
+			</div>
+</center></div>
+	<div class="sidebar">
+		<div><img src="./shree.jpg" height="605px" width="100%" id="Home" /></div>
+		<div>About me
+			 Who am I ?
+			 	<p id="About">Hey its me Shreejan Pandit. I am from Pokhara Nepal.I read in Gandaki College of engineering and science. I am studing Software engineering.</p>
+			 	<h1><p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+			 	tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+			 	quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+			 	consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+			 	cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+			 	proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p></h1>
+		</div>
+	</div>
+</div>
+<!-- https://colorlib.com/preview/#jackson -->
 </body>
 </html>
