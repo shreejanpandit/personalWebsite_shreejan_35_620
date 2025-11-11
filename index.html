@@ -1,1 +1,216 @@
-Shreejan pandit 
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Shreejan Pandit — Floating Text</title>
+  <style>
+    :root{
+      --bg1:#0f1724;
+      --bg2:#0b1b2b;
+      --accent1:#6ee7b7;
+      --accent2:#60a5fa;
+      --glass: rgba(255,255,255,0.04);
+      --text-size: clamp(36px, 9vw, 96px);
+    }
+
+    /* Basic reset */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(1200px 600px at 10% 20%, rgba(96,165,250,0.06), transparent 10%),
+                  radial-gradient(900px 500px at 90% 80%, rgba(110,231,183,0.04), transparent 10%),
+                  linear-gradient(180deg,var(--bg1),var(--bg2));
+      color: white;
+      min-height:100vh;
+      display:grid;
+      place-items:center;
+      overflow:hidden;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+
+    /* Stage that holds letters */
+    .stage{
+      position:relative;
+      width:min(92vw,1200px);
+      height:50vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      perspective:800px;
+      user-select:none;
+    }
+
+    .line{
+      display:flex;
+      gap:0.2em;
+      backface-visibility:hidden;
+      filter:drop-shadow(0 8px 30px rgba(2,6,23,0.6));
+    }
+
+    .char{
+      display:inline-block;
+      font-weight:700;
+      font-size:var(--text-size);
+      line-height:1;
+      transform-style:preserve-3d;
+      padding:0.02em 0.06em;
+      border-radius:8px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      transition:transform 400ms cubic-bezier(.2,.9,.3,1), filter 300ms, text-shadow 300ms;
+      will-change:transform;
+      cursor:default;
+      --tx: 0px; /* dynamic translate from mouse */
+    }
+
+    /* letter inner for glow and 3D feel */
+    .char .inner{
+      display:inline-block;
+      transform: translateZ(12px);
+      padding:0.06em 0.12em;
+    }
+
+    /* soft neon text */
+    .char .inner::selection{background:transparent}
+    .char .inner{
+      background:linear-gradient(90deg,var(--accent1),var(--accent2));
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+      text-shadow: 0 6px 28px rgba(2,6,23,0.6), 0 1px 0 rgba(255,255,255,0.02);
+    }
+
+    /* floating animation */
+    @keyframes floatY{ 
+      0%{ transform: translate3d(var(--tx), 0px, 0) rotateX(0.2deg);} 
+      50%{ transform: translate3d(var(--tx), -18px, 0) rotateX(0.2deg);} 
+      100%{ transform: translate3d(var(--tx), 0px, 0) rotateX(0.2deg);} 
+    }
+
+    @keyframes floatRotate{
+      0%{ transform: rotate(-2deg);} 
+      50%{ transform: rotate(4deg);} 
+      100%{ transform: rotate(-2deg);} 
+    }
+
+    /* apply animation with slight delays so each char moves independently */
+    .char{ animation: floatY 4.2s ease-in-out infinite; }
+
+    /* subtle hover interaction */
+    .char:hover{ transform: translate3d(0,-10px,30px) scale(1.06); filter:brightness(1.08) saturate(1.05); }
+    .char:hover .inner{ text-shadow: 0 10px 40px rgba(36,99,235,0.12); }
+
+    /* Accessibility: respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      .char{ animation:none !important; transition:none !important; }
+    }
+
+    /* small footer hint */
+    .hint{
+      position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+      font-size:13px;color:rgba(255,255,255,0.5);backdrop-filter: blur(6px);padding:6px 10px;border-radius:999px;
+      background:var(--glass);
+    }
+
+    /* responsive adjustments */
+    @media (max-width:600px){
+      .stage{height:40vh}
+      :root{--text-size: clamp(28px, 11vw, 64px);}
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" aria-label="Shreejan Pandit animated text">
+    <div class="line" id="line"></div
+  </main>
+
+  <script>
+    (function(){
+      const TEXT = 'Shreejan Pandit';
+      const line = document.getElementById('line');
+
+      // create span for each character
+      [...TEXT].forEach((ch,i)=>{
+        const span = document.createElement('span');
+        span.className = 'char';
+        // give each char its own random vertical amplitude and animation delay
+        const delay = (Math.random()*1.8 - 0.9).toFixed(3); // between -0.9s and 0.9s
+        const duration = (3.8 + Math.random()*1.6).toFixed(3);
+        span.style.animationDelay = delay + 's';
+        span.style.animationDuration = duration + 's';
+
+        // slight individual 3D offset for depth
+        const z = (Math.random()*18 - 8).toFixed(2);
+        span.style.transform = `translateZ(${z}px)`;
+
+        // inner to render gradient text
+        const inner = document.createElement('span');
+        inner.className = 'inner';
+        inner.textContent = ch === ' ' ? '\u00A0' : ch;
+        span.appendChild(inner);
+
+        line.appendChild(span);
+      });
+
+      // mouse parallax — moves letters a little according to mouse
+      const chars = document.querySelectorAll('.char');
+      const stage = document.querySelector('.stage');
+
+      function handleMove(e){
+        const rect = stage.getBoundingClientRect();
+        const cx = rect.left + rect.width/2;
+        const cy = rect.top + rect.height/2;
+        const dx = (e.clientX - cx)/rect.width; // -0.5 .. 0.5
+        const dy = (e.clientY - cy)/rect.height;
+
+        chars.forEach((el, idx)=>{
+          // each char gets slightly different factor
+          const factor = 8 + (idx % 5);
+          const tx = (dx * factor).toFixed(2) + 'px';
+          // set CSS variable used by floatY
+          el.style.setProperty('--tx', tx);
+
+          // slight rotation on x and y
+          const rx = (dy * 6).toFixed(2);
+          const ry = (dx * (idx%3+1) * 3).toFixed(2);
+          el.style.transform = `translateZ(${getZ(el)}px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+        });
+      }
+
+      function getZ(el){
+        // extract the translateZ from initial transform
+        const m = el.style.transform.match(/translateZ\((-?\d+(?:\.\d+)?)px\)/);
+        return m ? m[1] : 0;
+      }
+
+      // Reset transform when mouse leaves
+      function handleLeave(){
+        chars.forEach(el=>{
+          el.style.setProperty('--tx','0px');
+          el.style.transform = `translateZ(${getZ(el)}px)`;
+        });
+      }
+
+      // Touch support: use touchmove similar to mouse
+      function touchMove(e){
+        if(!e.touches || e.touches.length===0) return;
+        handleMove(e.touches[0]);
+      }
+
+      // Respect reduced motion — don't add parallax
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if(!reduced){
+        window.addEventListener('mousemove', handleMove);
+        window.addEventListener('touchmove', touchMove, {passive:true});
+        stage.addEventListener('mouseleave', handleLeave);
+      } else {
+        // if reduced motion, disable animations for accessibility
+        document.querySelectorAll('.char').forEach(el=>el.style.animation='none');
+      }
+
+    })();
+  </script>
+</body>
+</html>
